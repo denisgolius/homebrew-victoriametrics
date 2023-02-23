@@ -4,7 +4,7 @@ class Victoriametrics < Formula
   url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/v1.79.8.tar.gz"
   sha256 "aed027c8dabe1cb001f393e361930c675283f4818fd683641e59521eba15cf0b"
   license "Apache-2.0"
-  head 'https://git@github.com:VictoriaMetrics/VictoriaMetrics.git'    
+  # head 'https://git@github.com:VictoriaMetrics/VictoriaMetrics.git'    
 
   depends_on "go" => :build
   depends_on "cmake" => :build
@@ -14,15 +14,15 @@ class Victoriametrics < Formula
     mkdir_p buildpath/"src/github.com/VictoriaMetrics"
     ln_sf buildpath, buildpath/"src/github.com/VictoriaMetrics"
 
-    system "make", "victoria-metrics"
-    bin.install "bin/victoria-metrics"
+    system "make", "victoria-metrics-pure"
+    bin.install "bin/victoria-metrics-pure"
     mkdir_p etc"/victoriametrics/vmsingle"
     mkdir_p var"/log/victoriametrics/vmsingle"
     mkdir_p var"/lib/victoriametrics-data"
 
     (bin/"victoriametrics_brew_services").write <<~EOS
       #!/bin/bash
-      exec #{bin}/victoria-metrics $(<#{etc}/victoriametrics/vmsingle/victoriametrics.args)
+      exec #{bin}/victoria-metrics-pure $(<#{etc}/victoriametrics/vmsingle/victoriametrics.args)
     EOS
 
     (buildpath/"victoriametrics.args").write <<~EOS
