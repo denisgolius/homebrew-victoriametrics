@@ -9,24 +9,29 @@ class Victoriametrics < Formula
   depends_on "go" => :build
   
   def install
+    ENV.deparallelize
     mkdir_p buildpath/"src/github.com/VictoriaMetrics"
     ln_sf buildpath, buildpath/"src/github.com/VictoriaMetrics/VictoriaMetrics"
 
     system "make", "victoria-metrics"
     bin.install "bin/victoria-metrics"
-    mkdir_p etc"/victoria-metrics/vmsingle"
-    mkdir_p var"/log/victoria-metrics/vmsingle"
-    mkdir_p var"lib/victoria-metrics-data""
+    mkdir_p etc"/victoriametrics/vmsingle"
+    mkdir_p var"/log/victoriametrics/vmsingle"
+    mkdir_p var"/lib/victoriametrics-data"
 
     (bin/"victoriametrics_brew_services").write <<~EOS
       #!/bin/bash
-      exec #{bin}/victoria-metrics $(<#{etc}/victoria-metrics/vmsingle.args)
+      exec #{bin}/victoria-metrics $(<#{etc}/victoriametrics/vmsingle/victoriametrics.args)
     EOS
 
     (buildpath/"victoriametrics.args").write <<~EOS
-      --config.file #{etc}/scrape.yml --storageDataPath=/var/lib/victoria-metrics-data
-      --retentionPeriod=12 --httpListenAddr=127.0.0.1:8428 --graphiteListenAddr=:2003 --opentsdbListenAddr=:4242
-      --influxListenAddr=:8089 --enableTCP
+      --config.file #{etc}/victoriametrics/vmsingle/scrape.yml --storageDataPath=/var/lib/victoria-metrics-data
+      --retentionPeriod=12
+      --httpListenAddr=127.0.0.1:8428 
+      --graphiteListenAddr=:2003 
+      --opentsdbListenAddr=:4242
+      --influxListenAddr=:8089 
+      --enableTCP
     EOS
 
     (buildpath/"scrape.yml").write <<~EOS
@@ -45,15 +50,15 @@ class Victoriametrics < Formula
     <<~EOS
       When run from `brew services`, `victoriametrics` is run from
       `victoriametrics_brew_services` and uses the flags in:
-        #{etc}/victoria-metrics/vmsingle.args
+        #{etc}/victoria-metrics/vmsingle/vmsingle.args
     EOS
   end
 
   service do
     run [opt_bin/"victoriametrics_brew_services"]
     keep_alive false
-    log_path var/"log/victoria-metrics/vmsingle/victoria-metrics.log"
-    error_log_path var/"log/victoria-metrics/vmsingle/victoria-metrics.err.log"
+    log_path var/"log/victoriametrics/vmsingle/victoria-metrics.log"
+    error_log_path var/"log/victoriametrics/vmsingle/victoria-metrics.err.log"
   end
 
   test do
