@@ -7,11 +7,12 @@ class Victoriametrics < Formula
   head 'https://git@github.com:VictoriaMetrics/VictoriaMetrics.git'    
 
   depends_on "go" => :build
+  depends_on "cmake" => :build
   
   def install
     ENV.deparallelize
     mkdir_p buildpath/"src/github.com/VictoriaMetrics"
-    ln_sf buildpath, buildpath/"src/github.com/VictoriaMetrics/VictoriaMetrics"
+    ln_sf buildpath, buildpath/"src/github.com/VictoriaMetrics"
 
     system "make", "victoria-metrics"
     bin.install "bin/victoria-metrics"
