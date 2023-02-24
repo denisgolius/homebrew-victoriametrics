@@ -1,6 +1,6 @@
 class Victoriametrics < Formula
   desc "Cost-effective and scalable monitoring solution and time series database"
-  homepage "https://victoriametrics.com/"
+  homepage "https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/v1.79.8.tar.gz"
   sha256 "aed027c8dabe1cb001f393e361930c675283f4818fd683641e59521eba15cf0b"
   license "Apache-2.0"
