@@ -22,4 +22,5 @@ class VictoriametricsVmctl < Formula
         Process.kill "TERM", wait_thr.pid
       end
     end
+  end
 end
