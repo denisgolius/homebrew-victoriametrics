@@ -11,13 +11,16 @@ class VictoriametricsVmctl < Formula
   def install
     system "make", "vmctl"
     bin.install "bin/vmctl"
+    ohai 'Thanks for using VictoriaMetrics command-line tool!'
+    ohai 'See the vmctl documetation: https://docs.victoriametrics.com/vmctl.html'
+    ohai 'Join our communities: https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#contacts'
   end
 
   test do
     Open3.popen3("#{bin}/vmctl") do |_, stdout, _, wait_thr|
       sleep 0.5
       begin
-        assert_match "build version", stdout.read
+        assert_match "help", stdout.read
       ensure
         Process.kill "TERM", wait_thr.pid
       end
