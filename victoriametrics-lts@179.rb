@@ -1,8 +1,8 @@
-class Victoriametrics < Formula
+class VictoriametricsLtsAT179 < Formula
   desc "Cost-effective and scalable monitoring solution and time series database"
   homepage "https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html"
-  url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/v1.79.8.tar.gz"
-  sha256 "aed027c8dabe1cb001f393e361930c675283f4818fd683641e59521eba15cf0b"
+  url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/v1.79.10.tar.gz"
+  sha256 "014e958b8e357cf003b153c2c29e4ef62667ffaacb5aa10a37dea3d5709d7b13"
   license "Apache-2.0"
   # head 'https://git@github.com:VictoriaMetrics/VictoriaMetrics.git'    
 
