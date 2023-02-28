@@ -31,7 +31,7 @@ class Victoriametrics < Formula
       --graphiteListenAddr=:2003 
       --opentsdbListenAddr=:4242
       --influxListenAddr=:8089 
-      --enableTCP
+      --enableTCP6
     EOS
 
     (buildpath/"scrape.yml").write <<~EOS
