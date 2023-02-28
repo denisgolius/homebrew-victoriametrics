@@ -17,9 +17,6 @@ class Victoriametrics < Formula
 
     system "make", "victoria-metrics"
     bin.install "bin/victoria-metrics"
-    # mkdir_p etc"/victoriametrics/vmsingle"
-    # mkdir_p var"/log/victoriametrics/vmsingle"
-    # mkdir_p var"/lib/victoriametrics-data"
 
     (bin/"victoriametrics_brew_services").write <<~EOS
       #!/bin/bash
@@ -27,7 +24,7 @@ class Victoriametrics < Formula
     EOS
 
     (buildpath/"victoriametrics.args").write <<~EOS
-      --config.file #{etc}/scrape.yml
+      --promscrape.config #{etc}/scrape.yml
       --storageDataPath=#{var}/victoriametrics-data
       --retentionPeriod=12
       --httpListenAddr=127.0.0.1:8428 
