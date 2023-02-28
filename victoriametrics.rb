@@ -6,7 +6,6 @@ class Victoriametrics < Formula
   license "Apache-2.0"
   # head 'https://git@github.com:VictoriaMetrics/VictoriaMetrics.git'    
 
-  depends_on "gnu-tar" => :build
   depends_on "go" => :build
   depends_on "cmake" => :build
   
@@ -41,7 +40,7 @@ class Victoriametrics < Formula
       scrape_configs:
         - job_name: "victoriametrics"
           static_configs:
-          - targets: ["localhost:8429"]
+          - targets: ["127.0.0.1:8428"]
     EOS
     etc.install "victoriametrics.args", "scrape.yml"
   end
