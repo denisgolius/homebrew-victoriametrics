@@ -50,7 +50,7 @@ class Victoriametrics < Formula
     <<~EOS
       When run from `brew services`, `victoriametrics` is run from
       `victoriametrics_brew_services` and uses the flags in:
-        #{etc}/vmsingle.args
+        #{etc}/victoriametrics.args
     EOS
   end
 
