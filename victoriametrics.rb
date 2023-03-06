@@ -60,7 +60,7 @@ class Victoriametrics < Formula
   test do
     http_port = free_port
 
-    (buildpath/"scrape.yml").write <<~EOS
+    (testpath/"scrape.yml").write <<~EOS
       global:
         scrape_interval: 10s
 
