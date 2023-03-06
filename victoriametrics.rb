@@ -1,18 +1,15 @@
-class VictoriametricsLtsAT179 < Formula
+class Victoriametrics < Formula
   desc "Cost-effective and scalable monitoring solution and time series database"
-  homepage "https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html"
-  url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/v1.79.10.tar.gz"
-  sha256 "014e958b8e357cf003b153c2c29e4ef62667ffaacb5aa10a37dea3d5709d7b13"
+  homepage "https://victoriametrics.com/"
+  url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/v1.88.1.tar.gz"
+  sha256 "92803ae61f927b7173e25d4537c429bf3054edfa2f719bafc8fb9fcd411cab87"
   license "Apache-2.0"
-  # head 'https://git@github.com:VictoriaMetrics/VictoriaMetrics.git'    
 
-  depends_on "go" => :build
   depends_on "cmake" => :build
-  
+  depends_on "go" => :build
+
   def install
     ENV.deparallelize
-    mkdir_p buildpath/"src/github.com/VictoriaMetrics"
-    ln_sf buildpath, buildpath/"src/github.com/VictoriaMetrics/VictoriaMetrics"
 
     system "make", "victoria-metrics"
     bin.install "bin/victoria-metrics"
@@ -23,13 +20,13 @@ class VictoriametricsLtsAT179 < Formula
     EOS
 
     (buildpath/"victoriametrics.args").write <<~EOS
-      --promscrape.config #{etc}/scrape.yml
+      --promscrape.config=#{etc}/scrape.yml
       --storageDataPath=#{var}/victoriametrics-data
       --retentionPeriod=12
-      --httpListenAddr=127.0.0.1:8428 
-      --graphiteListenAddr=:2003 
+      --httpListenAddr=127.0.0.1:8428
+      --graphiteListenAddr=:2003
       --opentsdbListenAddr=:4242
-      --influxListenAddr=:8089 
+      --influxListenAddr=:8089
       --enableTCP6
     EOS
 
@@ -61,14 +58,27 @@ class VictoriametricsLtsAT179 < Formula
   end
 
   test do
-    Open3.popen3("#{bin}/victoria-metrics") do |_, stdout, _, wait_thr|
-      sleep 0.5
-      begin
-        assert_match "build version", stdout.read
-      ensure
-        Process.kill "TERM", wait_thr.pid
-      end
+    http_port = free_port
+
+    (buildpath/"scrape.yml").write <<~EOS
+      global:
+        scrape_interval: 10s
+
+      scrape_configs:
+        - job_name: "victoriametrics"
+          static_configs:
+          - targets: ["127.0.0.1:#{http_port}"]
+    EOS
+
+    pid = fork do
+      exec bin/"victoria-metrics" "-promscrape.config=#{testpath}/scrape.yml" "-storageDataPath=#{testpath}/victoriametrics-data" "-httpListenAddr=127.0.0.1:#{http_port}"
     end
+    sleep 3
+    assert_match "Single-node VictoriaMetrics", shell_output("curl -s 127.0.0.1:#{http_port}")
+  ensure
+    Process.kill(9, pid)
+    Process.wait(pid)
   end
+
+  assert_match version.to_s, shell_output("#{bin}/victoria-metrics --version")
 end
-  
