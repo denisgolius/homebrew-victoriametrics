@@ -79,6 +79,4 @@ class Victoriametrics < Formula
     Process.kill(9, pid)
     Process.wait(pid)
   end
-
-  assert_match version.to_s, shell_output("#{bin}/victoria-metrics --version")
 end
