@@ -1,5 +1,5 @@
 class Vmctl < Formula
-  desc "vmctl provides various useful actions with VictoriaMetrics components"
+  desc "Data migration tool helping to migrate data from supported databases to VictoriaMetrics"
   homepage "https://docs.victoriametrics.com/vmctl.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
       tag:      "v1.89.1",
