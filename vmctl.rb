@@ -6,21 +6,16 @@ class Vmctl < Formula
   license "Apache-2.0"
 
   depends_on "go" => :build
-  depends_on "make" => :build
 
   def install
     system "make", "vmctl"
     bin.install "bin/vmctl"
+    ohai "Documentation: https://docs.victoriametrics.com/vmctl.html"
+    ohai "VictoriaMetrics Github : https://github.com/VictoriaMetrics/VictoriaMetrics"
+    ohai "Join our communities: https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#contacts"
   end
 
   test do
-    Open3.popen3("#{bin}/vmctl -v") do |_, stdout, _, wait_thr|
-      sleep 0.5
-      begin
-        assert_match "vmctl version", stdout.read
-      ensure
-        Process.kill "TERM", wait_thr.pid
-      end
-    end
+    assert_match version.to_s, shell_output("#{bin}/vmctl --version")
   end
 end
