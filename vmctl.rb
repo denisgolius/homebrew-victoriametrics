@@ -1,6 +1,5 @@
 class Vmctl < Formula
-  desc "VictoriaMetrics command-line tool \
-    vmctl provides various useful actions with VictoriaMetrics components"
+  desc "vmctl provides various useful actions with VictoriaMetrics components"
   homepage "https://docs.victoriametrics.com/vmctl.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
       tag:      "v1.89.1",
