@@ -1,12 +1,13 @@
 class Vmctl < Formula
-  desc "VictoriaMetrics command-line tool which provide Vmctl data migration from different TSDB to VictoriaMetrics"
+  desc "VictoriaMetrics command-line tool \
+    vmctl provides various useful actions with VictoriaMetrics components"
   homepage "https://docs.victoriametrics.com/vmctl.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
       tag:      "v1.89.1",
       revision: "388d6ee16e6b51597f05d5556027943a4cb07547"
   license "Apache-2.0"
-  # head "https://github.com/VictoriaMetrics/VictoriaMetrics.git", branch: "master"
-  
+  head "https://github.com/VictoriaMetrics/VictoriaMetrics.git", branch: "master"
+
   depends_on "go" => :build
 
   def install
