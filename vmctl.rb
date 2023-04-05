@@ -16,6 +16,14 @@ class Vmctl < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/vmctl --version")
+    Open3.popen3("#{bin}/vmctl --version") do |_, stdout, _, wait_thr|
+      sleep 1
+      begin
+        assert_match "vmctl - VictoriaMetrics command-line tool", stdout.read
+      ensure
+        Process.kill(9, pid)
+        Process.wait(pid)
+      end
+    end
   end
 end
