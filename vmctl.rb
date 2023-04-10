@@ -2,8 +2,8 @@ class Vmctl < Formula
   desc "Data migration tool used to migrate data from supported DBs to VictoriaMetrics"
   homepage "https://docs.victoriametrics.com/vmctl.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
-      tag:      "v1.89.1",
-      revision: "388d6ee16e6b51597f05d5556027943a4cb07547"
+      tag:      "v1.90.0",
+      revision: "b5d18c0d281b5bcd4dc13cc72d897c38fd4bb374"
   license "Apache-2.0"
   head "https://github.com/VictoriaMetrics/VictoriaMetrics.git", branch: "master"
 
