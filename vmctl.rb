@@ -1,4 +1,4 @@
-class Vmctl < Formula
+class Vmagent < Formula
   desc "Data migration tool used to migrate data from supported DBs to VictoriaMetrics"
   homepage "https://docs.victoriametrics.com/vmctl.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
@@ -10,8 +10,11 @@ class Vmctl < Formula
   depends_on "go" => :build
 
   def install
-    system "make", "vmctl"
-    bin.install "bin/vmctl"
+    ldflags = %W[
+      -s -w
+      -X github.com/VictoriaMetrics/VictoriaMetrics/lib/buildinfo.Version=vmctl-#{time.strftime("%Y%m%d-%H%M%S")}-#{version}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags), "./app/vmctl"
   end
 
   test do
