@@ -1,4 +1,4 @@
-class Vmagent < Formula
+class Vmctl < Formula
   desc "Data migration tool used to migrate data from supported DBs to VictoriaMetrics"
   homepage "https://docs.victoriametrics.com/vmctl.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
@@ -10,7 +10,9 @@ class Vmagent < Formula
   depends_on "go" => :build
 
   def install
+    system "make", "vmctl"
     ldflags = %W[
+    bin.install "bin/vmctl"
       -s -w
       -X github.com/VictoriaMetrics/VictoriaMetrics/lib/buildinfo.Version=vmctl-#{time.strftime("%Y%m%d-%H%M%S")}-#{version}
     ]
@@ -18,6 +20,11 @@ class Vmagent < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/vmctl --version")
+    assert_match "Requests to make:", shell_output(
+    vmctl vm-native --s \
+    --vm-native-src-addr=https://play.victoriametrics.com/select/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus \
+    --vm-native-dst-addr=https://play.victoriametrics.com/insert/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus \
+    --vm-native-filter-match='{__name__!=""}' \
+    --vm-native-filter-time-start='2023-04-08T11:30:30Z')
   end
 end
