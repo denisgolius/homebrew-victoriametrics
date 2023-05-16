@@ -10,9 +10,7 @@ class Vmctl < Formula
   depends_on "go" => :build
 
   def install
-    system "make", "vmctl"
     ldflags = %W[
-    bin.install "bin/vmctl"
       -s -w
       -X github.com/VictoriaMetrics/VictoriaMetrics/lib/buildinfo.Version=vmctl-#{time.strftime("%Y%m%d-%H%M%S")}-#{version}
     ]
@@ -25,7 +23,7 @@ class Vmctl < Formula
     --vm-native-dst-addr=https://play.victoriametrics.com/insert/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus \
     --vm-native-filter-match='{__name__!=\"\"}' \
     --vm-native-filter-time-start='2023-05-08T11:30:30Z'")
-    sleep 60
+    sleep 90
     assert_match "Requests to make", output
   end
 end
