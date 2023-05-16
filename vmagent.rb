@@ -31,7 +31,8 @@ class Vmagent < Formula
       opt_bin/"vmagent",
       "-httpListenAddr=127.0.0.1:8429",
       "-promscrape.config=#{etc}/vmagent/scrape.yml",
-      "-storageDataPath=#{var}/vmagent-data",
+      "-remoteWrite.tmpDataPath==#{var}/vmagent-data",
+      "-remoteWrite.url=https://example.com:8428/api/v1/write"
     ]
     keep_alive false
     log_path var/"log/vmagent.log"
@@ -54,10 +55,11 @@ class Vmagent < Formula
       exec bin/"vmagent",
         "-httpListenAddr=127.0.0.1:#{http_port}",
         "-promscrape.config=#{testpath}/scrape.yml",
-        "-storageDataPath=#{testpath}/vmagent-data"
+        "-remoteWrite.tmpDataPath==#{testpath}/vmagent-data",
+        "-remoteWrite.url=https://example.com:8428/api/v1/write"
     end
-    sleep 3
-    assert_match "Single-node VictoriaMetrics", shell_output("curl -s 127.0.0.1:#{http_port}")
+    sleep 30
+    assert_match "reload configuration", shell_output("curl -s 127.0.0.1:#{http_port}")
   ensure
     Process.kill(9, pid)
     Process.wait(pid)
