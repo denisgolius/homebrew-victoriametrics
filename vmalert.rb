@@ -21,6 +21,7 @@ class Vmalert < Formula
       # Alerts group for vmalert assumes that Grafana dashboard
       # https://grafana.com/grafana/dashboards/14950-victoriametrics-vmalert/ is installed.
       # Pls update the `dashboard` annotation according to your setup.
+      # See more alerts and recoring rules at https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker
       - name: vmalert
         interval: 30s
         rules:
