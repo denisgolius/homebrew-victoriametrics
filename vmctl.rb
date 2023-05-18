@@ -7,6 +7,9 @@ class Vmctl < Formula
   license "Apache-2.0"
   head "https://github.com/VictoriaMetrics/VictoriaMetrics.git", branch: "master"
 
+  src_url="https://play.victoriametrics.com/select/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus"
+  dst_url="https://play.victoriametrics.com/select/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus"
+
   depends_on "go" => :build
 
   def install
@@ -19,8 +22,8 @@ class Vmctl < Formula
 
   test do
     output = shell_output("#{bin}/vmctl vm-native --s \
-    --vm-native-src-addr=https://play.victoriametrics.com/select/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus \
-    --vm-native-dst-addr=https://play.victoriametrics.com/insert/accounting/1/6a716b0f-38bc-4856-90ce-448fd713e3fe/prometheus \
+    --vm-native-src-addr=#{src_url} \
+    --vm-native-dst-addr=#{dst_url} \
     --vm-native-filter-match='{__name__!=\"\"}' \
     --vm-native-filter-time-start='2023-05-08T11:30:30Z'")
     sleep 90
