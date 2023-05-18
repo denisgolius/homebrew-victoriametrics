@@ -1,5 +1,5 @@
 class Vmagent < Formula
-  desc "A tiny agent which helps you collect metrics from various sources"
+  desc "Tiny agent which helps you collect metrics from various sources"
   homepage "https://docs.victoriametrics.com/vmagent.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
       tag:      "v1.90.0",

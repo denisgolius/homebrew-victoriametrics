@@ -1,6 +1,6 @@
-class Vmagent < Formula
-  desc "A tiny agent which helps you collect metrics from various sources"
-  homepage "https://docs.victoriametrics.com/vmagent.html"
+class Vmalert < Formula
+  desc "Tiny tool which executes a list of the given alerting or recording rules against configured -datasource.url compatible with Prometheus HTTP API"
+  homepage "https://docs.victoriametrics.com/vmalert.html"
   url "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
       tag:      "v1.90.0",
       revision: "b5d18c0d281b5bcd4dc13cc72d897c38fd4bb374"
@@ -16,52 +16,79 @@ class Vmagent < Formula
     ]
     system "go", "build", *std_go_args(ldflags: ldflags), "./app/vmalert"
 
-    (etc/"vmagent/scrape.yml").write <<~EOS
-      global:
-        scrape_interval: 10s
-      scrape_configs:
-        - job_name: "vmagent"
-          static_configs:
-          - targets: ["127.0.0.1:8429"]
+    (etc/"vmalert/alerts.yml").write <<~EOS
+      groups:
+      # Alerts group for vmalert assumes that Grafana dashboard
+      # https://grafana.com/grafana/dashboards/14950-victoriametrics-vmalert/ is installed.
+      # Pls update the `dashboard` annotation according to your setup.
+      - name: vmalert
+        interval: 30s
+        rules:
+          - alert: ConfigurationReloadFailure
+            expr: vmalert_config_last_reload_successful != 1
+            labels:
+              severity: warning
+            annotations:
+              summary: "Configuration reload failed for vmalert instance {{ $labels.instance }}"
+              description: "Configuration hot-reload failed for vmalert on instance {{ $labels.instance }}.
+                Check vmalert's logs for detailed error message."
+  
+          - alert: RemoteWriteErrors
+            expr: sum(increase(vmalert_remotewrite_errors_total[5m])) by(job, instance) > 0
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "vmalert instance {{ $labels.instance }} is failing to push metrics to remote write URL"
+              description: "vmalert instance {{ $labels.instance }} is failing to push metrics generated via alerting 
+                or recording rules to the configured remote write URL. Check vmalert's logs for detailed error message."
+    
+          - alert: AlertmanagerErrors
+            expr: sum(increase(vmalert_alerts_send_errors_total[5m])) by(job, instance, addr) > 0
+            for: 15m
+            labels:
+              severity: warning
+            annotations:
+              summary: "vmalert instance {{ $labels.instance }} is failing to send notifications to Alertmanager"
+              description: "vmalert instance {{ $labels.instance }} is failing to send alert notifications to \"{{ $labels.addr }}\".
+                Check vmalert's logs for detailed error message."
     EOS
   end
 
   service do
     run [
-      opt_bin/"vmagent",
-      "-httpListenAddr=127.0.0.1:8429",
-      "-promscrape.config=#{etc}/vmagent/scrape.yml",
-      "-remoteWrite.tmpDataPath==#{var}/vmagent-data",
-      "-remoteWrite.url=https://example.com:8428/api/v1/write"
+      opt_bin/"vmalert",
+      "-rule=alerts.yml",
+      "-datasource.url=http://vmsingle-url:8428",
+      "-notifier.url=http://alertmanager-url:9093",
+      "-remoteWrite.url=http://vmsingle-url:8428",
+      "-remoteRead.url=http://vmsingle-url:8428",
+      "-external.label=cluster=east-1",
+      "-external.label=replica=a" 
     ]
     keep_alive false
-    log_path var/"log/vmagent.log"
-    error_log_path var/"log/vmagent.err.log"
+    log_path var/"log/vmalert.log"
+    error_log_path var/"log/vmalert.err.log"
   end
 
-  test do
-    http_port = free_port
-
-    (testpath/"scrape.yml").write <<~EOS
-      global:
-        scrape_interval: 10s
-      scrape_configs:
-        - job_name: "vmagent"
-          static_configs:
-          - targets: ["127.0.0.1:#{http_port}"]
-    EOS
-
-    pid = fork do
-      exec bin/"vmagent",
-        "-httpListenAddr=127.0.0.1:#{http_port}",
-        "-promscrape.config=#{testpath}/scrape.yml",
-        "-remoteWrite.tmpDataPath==#{testpath}/vmagent-data",
-        "-remoteWrite.url=https://example.com:8428/api/v1/write"
-    end
-    sleep 30
-    assert_match "reload configuration", shell_output("curl -s 127.0.0.1:#{http_port}")
-  ensure
-    Process.kill(9, pid)
-    Process.wait(pid)
+    test do
+      (testpath/"alerts.yml").write <<~EOS
+        groups:
+        # Alerts group for vmalert assumes that Grafana dashboard
+        # https://grafana.com/grafana/dashboards/14950-victoriametrics-vmalert/ is installed.
+        # Pls update the `dashboard` annotation according to your setup.
+        - name: vmalert
+          interval: 30s
+          rules:
+            - alert: ConfigurationReloadFailure
+              expr: vmalert_config_last_reload_successful != 1
+              labels:
+                severity: warning
+              annotations:
+                summary: "Configuration reload failed for vmalert instance {{ $labels.instance }}"
+                description: "Configuration hot-reload failed for vmalert on instance {{ $labels.instance }}.
+                  Check vmalert's logs for detailed error message."
+      EOS
+    system "#{bin}/vmalert", "-rule=#{testpath}/alerts.yml", "-dryRun"
   end
 end
